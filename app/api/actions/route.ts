@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@/lib/init";
 import { getActions, updateAction } from "@/lib/storage";
 import { calculateRiskScore } from "@/lib/risk";
 

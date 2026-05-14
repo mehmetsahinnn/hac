@@ -28,7 +28,7 @@ interface StorageState {
   idCounter: number;
 }
 
-const globalForStorage = globalThis as unknown as { __storage?: StorageState };
+const globalForStorage = globalThis as unknown as { __storage?: StorageState; __seeded?: boolean };
 
 if (!globalForStorage.__storage) {
   globalForStorage.__storage = {
