@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@/lib/init";
 import Anthropic from "@anthropic-ai/sdk";
 import { getActions, getRetros } from "@/lib/storage";
 
@@ -92,9 +93,16 @@ Return ONLY valid JSON, no other text.`,
     return NextResponse.json({ insights, stats });
   } catch (error) {
     console.error("Insights error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate insights" },
-      { status: 500 }
-    );
+    return NextResponse.json({
+      insights: {
+        summary: "Insights su anda yuklenemiyor. Lutfen daha sonra tekrar deneyin.",
+        trends: [],
+        recurring_patterns: [],
+        lessons_learned: [],
+        recommendations: [],
+      },
+      stats: null,
+      error: String(error),
+    });
   }
 }

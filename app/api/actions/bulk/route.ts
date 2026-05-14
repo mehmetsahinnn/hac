@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@/lib/init";
 import { addActions } from "@/lib/storage";
 
 export async function POST(request: Request) {

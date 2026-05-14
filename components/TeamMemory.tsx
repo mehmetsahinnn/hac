@@ -28,10 +28,7 @@ export default function TeamMemory() {
 
   useEffect(() => {
     fetch("/api/insights")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
-      })
+      .then((res) => res.json())
       .then((data) => {
         setInsights(data.insights);
         setStats(data.stats || null);

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@/lib/init";
 import Anthropic from "@anthropic-ai/sdk";
 import { getActions } from "@/lib/storage";
 

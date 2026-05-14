@@ -17,11 +17,13 @@ export default function ReminderPreview() {
 
   useEffect(() => {
     fetch("/api/reminders")
-      .then((res) => {
-        if (!res.ok) throw new Error("Failed to fetch");
-        return res.json();
+      .then((res) => res.json())
+      .then((data) => {
+        setReminders(data.reminders || []);
+        if (data.error && (!data.reminders || data.reminders.length === 0)) {
+          setError(null);
+        }
       })
-      .then((data) => setReminders(data.reminders || []))
       .catch((err) => setError(err instanceof Error ? err.message : "Failed"))
       .finally(() => setLoading(false));
   }, []);

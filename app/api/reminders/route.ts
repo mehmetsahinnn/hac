@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@/lib/init";
 import Anthropic from "@anthropic-ai/sdk";
 import { getActions } from "@/lib/storage";
 import { calculateRiskScore } from "@/lib/risk";
@@ -66,9 +67,6 @@ Requirements:
     return NextResponse.json({ reminders });
   } catch (error) {
     console.error("Reminders error:", error);
-    return NextResponse.json(
-      { error: "Failed to generate reminders" },
-      { status: 500 }
-    );
+    return NextResponse.json({ reminders: [], error: String(error) });
   }
 }

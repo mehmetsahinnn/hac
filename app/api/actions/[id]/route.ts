@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import "@/lib/init";
 import { updateAction } from "@/lib/storage";
 
 const VALID_STATUSES = ["open", "in-progress", "closed"] as const;
