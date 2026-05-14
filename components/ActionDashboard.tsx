@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ActionList from "./ActionList";
 import { Action } from "@/lib/storage";
 
-type FilterStatus = "all" | Action["status"];
+type FilterStatus = "all" | "high-risk" | Action["status"];
 
 export default function ActionDashboard() {
   const [actions, setActions] = useState<Action[]>([]);
@@ -48,11 +48,20 @@ export default function ActionDashboard() {
     }
   };
 
-  const filteredActions =
-    filter === "all" ? actions : actions.filter((a) => a.status === filter);
+  const filteredActions = (() => {
+    switch (filter) {
+      case "all":
+        return actions;
+      case "high-risk":
+        return actions.filter((a) => a.risk_score >= 60);
+      default:
+        return actions.filter((a) => a.status === filter);
+    }
+  })();
 
   const counts = {
     all: actions.length,
+    "high-risk": actions.filter((a) => a.risk_score >= 60).length,
     open: actions.filter((a) => a.status === "open").length,
     "in-progress": actions.filter((a) => a.status === "in-progress").length,
     closed: actions.filter((a) => a.status === "closed").length,
@@ -61,25 +70,7 @@ export default function ActionDashboard() {
   if (loading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <svg
-          className="animate-spin h-6 w-6 text-blue-600"
-          viewBox="0 0 24 24"
-          fill="none"
-        >
-          <circle
-            className="opacity-25"
-            cx="12"
-            cy="12"
-            r="10"
-            stroke="currentColor"
-            strokeWidth="4"
-          />
-          <path
-            className="opacity-75"
-            fill="currentColor"
-            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-          />
-        </svg>
+        <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
       </div>
     );
   }
@@ -94,23 +85,37 @@ export default function ActionDashboard() {
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-4 gap-3">
-        {(["all", "open", "in-progress", "closed"] as FilterStatus[]).map(
-          (status) => (
-            <button
-              key={status}
-              onClick={() => setFilter(status)}
-              className={`px-3 py-2 rounded-lg text-sm font-medium text-center transition-colors ${
-                filter === status
-                  ? "bg-blue-600 text-white"
-                  : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
-              }`}
-            >
-              <span className="block text-lg font-bold">{counts[status]}</span>
-              <span className="capitalize">{status === "in-progress" ? "In Progress" : status}</span>
-            </button>
-          )
-        )}
+      <div className="grid grid-cols-5 gap-2">
+        {(
+          ["all", "high-risk", "open", "in-progress", "closed"] as FilterStatus[]
+        ).map((status) => (
+          <button
+            key={status}
+            onClick={() => setFilter(status)}
+            className={`px-2 py-2 rounded-lg text-xs font-medium text-center transition-colors ${
+              filter === status
+                ? status === "high-risk"
+                  ? "bg-red-600 text-white"
+                  : "bg-blue-600 text-white"
+                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+            }`}
+          >
+            <span className="block text-lg font-bold">
+              {counts[status]}
+            </span>
+            <span className="capitalize">
+              {status === "in-progress"
+                ? "Devam"
+                : status === "high-risk"
+                ? "Riskli"
+                : status === "all"
+                ? "Tumu"
+                : status === "open"
+                ? "Acik"
+                : "Kapali"}
+            </span>
+          </button>
+        ))}
       </div>
 
       <ActionList actions={filteredActions} onStatusChange={handleStatusChange} />

@@ -3,7 +3,7 @@ import { addActions } from "@/lib/storage";
 
 export async function POST(request: Request) {
   try {
-    const { actions } = await request.json();
+    const { actions, retro_id } = await request.json();
 
     if (!Array.isArray(actions) || actions.length === 0) {
       return NextResponse.json(
@@ -21,7 +21,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const created = addActions(actions);
+    const created = addActions(actions, retro_id);
     return NextResponse.json({ actions: created }, { status: 201 });
   } catch (error) {
     console.error("Bulk create error:", error);

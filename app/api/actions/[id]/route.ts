@@ -18,7 +18,15 @@ export async function PATCH(
       );
     }
 
-    const updated = updateAction(id, body);
+    const updates: Record<string, unknown> = {};
+    if (body.status) updates.status = body.status;
+    if (body.description) updates.description = body.description;
+    if (body.category) updates.category = body.category;
+    if (body.inferred_owner !== undefined) updates.inferred_owner = body.inferred_owner;
+    if (body.deadline !== undefined) updates.deadline = body.deadline;
+    if (body.closure_criteria !== undefined) updates.closure_criteria = body.closure_criteria;
+
+    const updated = updateAction(id, updates);
 
     if (!updated) {
       return NextResponse.json(

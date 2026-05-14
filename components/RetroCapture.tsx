@@ -4,7 +4,13 @@ import { useState } from "react";
 import ActionList from "./ActionList";
 import { Action } from "@/lib/storage";
 
-type ExtractedAction = Omit<Action, "id" | "status" | "created_at" | "closed_at">;
+type ExtractedAction = Omit<Action, "id" | "status" | "created_at" | "closed_at" | "risk_score">;
+
+interface RecurringMatch {
+  new_index: number;
+  past_id: string;
+  reason: string;
+}
 
 interface RetroCaptureProps {
   onSaved: () => void;
@@ -13,6 +19,8 @@ interface RetroCaptureProps {
 export default function RetroCapture({ onSaved }: RetroCaptureProps) {
   const [notes, setNotes] = useState("");
   const [extractedActions, setExtractedActions] = useState<ExtractedAction[]>([]);
+  const [retroId, setRetroId] = useState<string | null>(null);
+  const [recurringMatches, setRecurringMatches] = useState<RecurringMatch[]>([]);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,6 +46,8 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
 
       const data = await res.json();
       setExtractedActions(data.actions);
+      setRetroId(data.retro_id);
+      setRecurringMatches(data.recurring_matches || []);
       setStep("review");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -62,7 +72,13 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
       const res = await fetch("/api/actions/bulk", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ actions: extractedActions }),
+        body: JSON.stringify({
+          actions: extractedActions.map((a) => ({
+            ...a,
+            retro_id: retroId,
+          })),
+          retro_id: retroId,
+        }),
       });
 
       if (!res.ok) {
@@ -72,6 +88,8 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
 
       setNotes("");
       setExtractedActions([]);
+      setRetroId(null);
+      setRecurringMatches([]);
       setStep("input");
       onSaved();
     } catch (err) {
@@ -99,7 +117,7 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Paste your retrospective notes here...&#10;&#10;Example:&#10;- Fix auth timeout issue. Sarah needs to look at this.&#10;- We should improve the onboarding docs. Mike volunteered.&#10;- CI pipeline is too slow, blocks everyone."
+            placeholder="Retro notlarinizi buraya yapiştirin...&#10;&#10;Ornek:&#10;- Auth timeout sorununu cozmemiz lazim. Sarah bakacak.&#10;- Onboarding dokumanlari iyilestirilmeli. Mike gonullu oldu.&#10;- CI pipeline cok yavas, herkesi blokluyor."
             className="w-full h-48 border border-gray-300 rounded-lg p-4 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
           />
           <button
@@ -109,29 +127,11 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
           >
             {loading ? (
               <span className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                Extracting actions with AI...
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                AI ile aksiyonlar cikariliyor...
               </span>
             ) : (
-              "Extract Actions"
+              "Aksiyonlari Cikar"
             )}
           </button>
         </>
@@ -139,15 +139,31 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
         <>
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-semibold text-gray-900">
-              Review Extracted Actions ({extractedActions.length})
+              Cikarilan Aksiyonlar ({extractedActions.length})
             </h2>
             <button
               onClick={handleBack}
               className="text-sm text-gray-500 hover:text-gray-700"
             >
-              Back to edit
+              &larr; Geri
             </button>
           </div>
+
+          {/* Recurring warnings */}
+          {recurringMatches.length > 0 && (
+            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+              <p className="text-purple-800 text-sm font-semibold">
+                Tekrarlayan Sorunlar Tespit Edildi!
+              </p>
+              <ul className="mt-1 space-y-1">
+                {recurringMatches.map((m, i) => (
+                  <li key={i} className="text-purple-700 text-xs">
+                    #{m.new_index + 1}: {m.reason}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
 
           <ActionList
             actions={extractedActions as unknown as Action[]}
@@ -162,29 +178,11 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
           >
             {saving ? (
               <span className="flex items-center justify-center gap-2">
-                <svg
-                  className="animate-spin h-4 w-4"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
-                  <path
-                    className="opacity-75"
-                    fill="currentColor"
-                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                  />
-                </svg>
-                Saving...
+                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+                Kaydediliyor...
               </span>
             ) : (
-              "Save All Actions"
+              "Tum Aksiyonlari Kaydet"
             )}
           </button>
         </>
