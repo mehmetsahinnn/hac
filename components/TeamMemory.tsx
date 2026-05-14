@@ -36,24 +36,22 @@ export default function TeamMemory() {
         setInsights(data.insights);
         setStats(data.stats || null);
       })
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : "Failed to load")
-      )
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed"))
       .finally(() => setLoading(false));
   }, []);
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-2">
-        <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
-        <p className="text-sm text-gray-500">Takim hafizasi yukleniyor...</p>
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <span className="inline-block w-6 h-6 border-2 border-midnight/20 border-t-midnight rounded-full animate-spin" />
+        <p className="text-caption text-silver-ash">Takim hafizasi yukleniyor...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div className="bg-cloud-whisper border border-sunset-orange/20 text-sunset-orange px-5 py-4 rounded-cards text-sm">
         {error}
       </div>
     );
@@ -61,104 +59,71 @@ export default function TeamMemory() {
 
   if (!insights) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-sm">Henuz yeterli veri yok.</p>
+      <div className="text-center py-20">
+        <p className="text-silver-ash text-sm">Henuz yeterli veri yok.</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-10">
       {/* Summary */}
-      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-        <p className="text-sm text-blue-900">{insights.summary}</p>
+      <div className="bg-warm-ivory rounded-cards p-6">
+        <p className="text-body text-midnight">{insights.summary}</p>
       </div>
 
       {/* Stats */}
       {stats && (
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-            <span className="block text-2xl font-bold text-gray-900">
-              {stats.total_actions}
-            </span>
-            <span className="text-xs text-gray-500">Toplam Aksiyon</span>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-            <span className="block text-2xl font-bold text-green-600">
-              {stats.total_actions > 0
-                ? Math.round((stats.closed / stats.total_actions) * 100)
-                : 0}
-              %
-            </span>
-            <span className="text-xs text-gray-500">Tamamlanma</span>
-          </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-3 text-center">
-            <span className="block text-2xl font-bold text-red-600">
-              {stats.blockers}
-            </span>
-            <span className="text-xs text-gray-500">Blocker</span>
-          </div>
+        <div className="grid grid-cols-3 gap-5">
+          <MetricCard value={stats.total_actions} label="Toplam Aksiyon" />
+          <MetricCard
+            value={`${stats.total_actions > 0 ? Math.round((stats.closed / stats.total_actions) * 100) : 0}%`}
+            label="Tamamlanma"
+            accent
+          />
+          <MetricCard value={stats.blockers} label="Blocker" />
         </div>
       )}
 
-      {/* Trends */}
-      {insights.trends && insights.trends.length > 0 && (
-        <Section title="Trendler">
-          {insights.trends.map((t, i) => (
-            <li key={i} className="text-sm text-gray-700">
-              {t}
-            </li>
-          ))}
-        </Section>
+      {/* Sections */}
+      {insights.trends?.length > 0 && (
+        <InsightSection title="Trendler" items={insights.trends} />
       )}
-
-      {/* Recurring Patterns */}
-      {insights.recurring_patterns && insights.recurring_patterns.length > 0 && (
-        <Section title="Tekrarlayan Problemler">
-          {insights.recurring_patterns.map((p, i) => (
-            <li key={i} className="text-sm text-gray-700">
-              {p}
-            </li>
-          ))}
-        </Section>
+      {insights.recurring_patterns?.length > 0 && (
+        <InsightSection title="Tekrarlayan Problemler" items={insights.recurring_patterns} />
       )}
-
-      {/* Lessons */}
-      {insights.lessons_learned && insights.lessons_learned.length > 0 && (
-        <Section title="Ogrenilen Dersler">
-          {insights.lessons_learned.map((l, i) => (
-            <li key={i} className="text-sm text-gray-700">
-              {l}
-            </li>
-          ))}
-        </Section>
+      {insights.lessons_learned?.length > 0 && (
+        <InsightSection title="Ogrenilen Dersler" items={insights.lessons_learned} />
       )}
-
-      {/* Recommendations */}
-      {insights.recommendations && insights.recommendations.length > 0 && (
-        <Section title="Oneriler">
-          {insights.recommendations.map((r, i) => (
-            <li key={i} className="text-sm text-gray-700">
-              {r}
-            </li>
-          ))}
-        </Section>
+      {insights.recommendations?.length > 0 && (
+        <InsightSection title="Oneriler" items={insights.recommendations} />
       )}
     </div>
   );
 }
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+function MetricCard({ value, label, accent }: { value: number | string; label: string; accent?: boolean }) {
+  return (
+    <div className="bg-slate-mist rounded-cards p-5 text-center">
+      <span className={`block font-display text-heading-sm ${accent ? "text-sunset-orange" : "text-midnight"}`}>
+        {value}
+      </span>
+      <span className="text-caption text-silver-ash">{label}</span>
+    </div>
+  );
+}
+
+function InsightSection({ title, items }: { title: string; items: string[] }) {
   return (
     <div>
-      <h3 className="text-sm font-semibold text-gray-900 mb-2">{title}</h3>
-      <ul className="space-y-1 list-disc list-inside">{children}</ul>
+      <h3 className="font-display text-subheading text-midnight mb-4">{title}</h3>
+      <ul className="space-y-2">
+        {items.map((item, i) => (
+          <li key={i} className="text-body text-dark-shale pl-4 border-l-2 border-light-pearl">
+            {item}
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }

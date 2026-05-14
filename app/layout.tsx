@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Retro & Action Tracker",
-  description: "Extract and track action items from retrospective meetings with AI",
+  description: "AI-powered retrospective action extraction and tracking",
 };
 
 export default function RootLayout({
@@ -13,7 +13,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen bg-canvas-white">{children}</body>
     </html>
   );
 }

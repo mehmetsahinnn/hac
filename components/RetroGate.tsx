@@ -15,9 +15,7 @@ export default function RetroGate({ onPass }: RetroGateProps) {
     fetch("/api/actions")
       .then((res) => res.json())
       .then((data) => {
-        const open = data.actions.filter(
-          (a: Action) => a.status !== "closed"
-        );
+        const open = data.actions.filter((a: Action) => a.status !== "closed");
         setOpenActions(open);
       })
       .finally(() => setLoading(false));
@@ -40,8 +38,8 @@ export default function RetroGate({ onPass }: RetroGateProps) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <div className="animate-spin h-5 w-5 border-2 border-blue-600 border-t-transparent rounded-full" />
+      <div className="flex items-center justify-center py-20">
+        <span className="inline-block w-5 h-5 border-2 border-midnight/20 border-t-midnight rounded-full animate-spin" />
       </div>
     );
   }
@@ -52,47 +50,45 @@ export default function RetroGate({ onPass }: RetroGateProps) {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
-        <h3 className="text-amber-800 font-semibold text-sm">
-          Onceki Retro Aksiyonlari Bekliyor
+    <div className="space-y-6">
+      <div className="bg-warm-ivory rounded-cards p-6">
+        <h3 className="font-display text-subheading text-midnight">
+          Onceki Aksiyonlar Bekliyor
         </h3>
-        <p className="text-amber-700 text-xs mt-1">
+        <p className="text-caption text-dark-shale mt-2">
           Yeni retro baslatmadan once bu aksiyonlari gozden gecirin.
         </p>
       </div>
 
-      <ul className="space-y-2">
+      <ul className="space-y-3">
         {openActions.map((action) => (
           <li
             key={action.id}
-            className="flex items-center justify-between border border-gray-200 rounded-lg p-3 bg-white"
+            className="flex items-center justify-between bg-slate-mist rounded-cards p-4"
           >
             <div className="flex-1 min-w-0">
-              <p className="text-sm text-gray-900 truncate">
+              <p className="text-sm text-midnight truncate">
                 {action.description}
               </p>
               <div className="flex items-center gap-2 mt-1">
                 {action.inferred_owner && (
-                  <span className="text-xs text-gray-500">
+                  <span className="text-caption text-silver-ash">
                     {action.inferred_owner}
                   </span>
                 )}
-                <span className="text-xs px-1.5 py-0.5 rounded bg-orange-100 text-orange-700">
+                <span className="badge bg-sunset-orange/10 text-sunset-orange">
                   {action.status}
                 </span>
               </div>
             </div>
             <select
               value={action.status}
-              onChange={(e) =>
-                handleStatusUpdate(action.id, e.target.value as Action["status"])
-              }
-              className="text-xs border border-gray-300 rounded px-2 py-1 ml-3"
+              onChange={(e) => handleStatusUpdate(action.id, e.target.value as Action["status"])}
+              className="input-field text-caption ml-4"
             >
-              <option value="open">Open</option>
-              <option value="in-progress">In Progress</option>
-              <option value="closed">Closed</option>
+              <option value="open">Acik</option>
+              <option value="in-progress">Devam</option>
+              <option value="closed">Kapali</option>
             </select>
           </li>
         ))}
@@ -100,9 +96,9 @@ export default function RetroGate({ onPass }: RetroGateProps) {
 
       <button
         onClick={onPass}
-        className="w-full text-sm text-gray-500 hover:text-gray-700 py-2 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+        className="btn-secondary w-full py-3 border border-light-pearl rounded-buttons hover:bg-cloud-whisper"
       >
-        Gozden Gecirmeyi Atla &rarr;
+        Gozden Gecirmeyi Atla
       </button>
     </div>
   );

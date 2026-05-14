@@ -9,31 +9,23 @@ interface ActionListProps {
   onStatusChange?: (id: string, status: Action["status"]) => void;
 }
 
-const CATEGORY_COLORS: Record<string, string> = {
-  bug: "bg-red-100 text-red-700",
-  feature: "bg-blue-100 text-blue-700",
-  refactor: "bg-purple-100 text-purple-700",
-  process: "bg-yellow-100 text-yellow-700",
-  other: "bg-gray-100 text-gray-700",
+const CATEGORY_STYLES: Record<string, string> = {
+  bug: "bg-sunset-orange/10 text-sunset-orange",
+  feature: "bg-midnight/5 text-midnight",
+  refactor: "bg-data-gold/10 text-data-gold",
+  process: "bg-warm-ivory text-dark-shale",
+  other: "bg-slate-mist text-silver-ash",
 };
 
-const STATUS_COLORS: Record<string, string> = {
-  open: "bg-orange-100 text-orange-700",
-  "in-progress": "bg-blue-100 text-blue-700",
-  closed: "bg-green-100 text-green-700",
-};
-
-function getRiskColor(score: number): string {
-  if (score >= 60) return "bg-red-600 text-white";
-  if (score >= 30) return "bg-yellow-500 text-white";
-  return "bg-green-500 text-white";
+function getRiskStyle(score: number): string {
+  if (score >= 60) return "bg-sunset-orange text-canvas-white";
+  if (score >= 30) return "bg-data-gold text-canvas-white";
+  return "bg-slate-mist text-dark-shale";
 }
 
 function getDeadlineStatus(deadline: string | null, status: string): string | null {
   if (!deadline || status === "closed") return null;
-  const now = new Date();
-  const dl = new Date(deadline);
-  const diffDays = (dl.getTime() - now.getTime()) / (1000 * 60 * 60 * 24);
+  const diffDays = (new Date(deadline).getTime() - Date.now()) / 86400000;
   if (diffDays < 0) return "overdue";
   if (diffDays <= 3) return "approaching";
   return null;
@@ -47,138 +39,123 @@ export default function ActionList({
 }: ActionListProps) {
   if (actions.length === 0) {
     return (
-      <p className="text-gray-500 text-center py-8">No actions to display.</p>
+      <p className="text-silver-ash text-center py-12 text-sm">
+        Goruntulecek aksiyon yok.
+      </p>
     );
   }
 
   return (
-    <ul className="space-y-3">
+    <ul className="space-y-4">
       {actions.map((action, index) => {
-        const deadlineStatus = getDeadlineStatus(action.deadline, action.status);
+        const dlStatus = getDeadlineStatus(action.deadline, action.status);
 
         return (
           <li
             key={action.id || index}
-            className={`border rounded-lg p-4 bg-white shadow-sm ${
-              deadlineStatus === "overdue"
-                ? "border-red-300"
-                : deadlineStatus === "approaching"
-                ? "border-yellow-300"
-                : "border-gray-200"
+            className={`rounded-cards p-5 transition-all ${
+              dlStatus === "overdue"
+                ? "bg-canvas-white border-2 border-sunset-orange/40"
+                : dlStatus === "approaching"
+                ? "bg-canvas-white border-2 border-data-gold/40"
+                : "bg-slate-mist border border-transparent"
             }`}
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0 space-y-3">
                 {editable ? (
                   <input
                     type="text"
                     value={action.description}
-                    onChange={(e) =>
-                      onEdit?.(index, "description", e.target.value)
-                    }
-                    className="w-full text-sm font-medium text-gray-900 border border-gray-300 rounded px-2 py-1"
+                    onChange={(e) => onEdit?.(index, "description", e.target.value)}
+                    className="input-field w-full text-sm font-medium"
                   />
                 ) : (
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-midnight">
                     {action.description}
                   </p>
                 )}
 
-                {/* Badges row */}
-                <div className="flex flex-wrap items-center gap-2 mt-2">
-                  <span
-                    className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                      CATEGORY_COLORS[action.category] || CATEGORY_COLORS.other
-                    }`}
-                  >
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className={`badge ${CATEGORY_STYLES[action.category] || CATEGORY_STYLES.other}`}>
                     {action.category}
                   </span>
 
                   {action.is_blocker && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-600 text-white">
+                    <span className="badge bg-sunset-orange text-canvas-white">
                       BLOCKER
                     </span>
                   )}
 
-                  {/* Risk Score Badge */}
                   {!editable && action.risk_score > 0 && (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getRiskColor(
-                        action.risk_score
-                      )}`}
-                      title={`Risk: ${action.risk_score}/100`}
-                    >
+                    <span className={`badge ${getRiskStyle(action.risk_score)}`}>
                       Risk {action.risk_score}
                     </span>
                   )}
 
-                  {/* Recurring Badge */}
                   {action.recurring_count > 0 && (
-                    <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-600 text-white">
+                    <span className="badge bg-data-gold/10 text-data-gold">
                       Tekrarlayan x{action.recurring_count}
                     </span>
                   )}
 
                   {action.inferred_owner && (
-                    <span className="text-xs text-gray-500">
+                    <span className="text-caption text-silver-ash">
                       {action.inferred_owner}
                     </span>
                   )}
 
                   {!editable && action.status && (
-                    <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        STATUS_COLORS[action.status]
-                      }`}
-                    >
-                      {action.status}
+                    <span className={`badge ${
+                      action.status === "closed"
+                        ? "bg-midnight/5 text-midnight"
+                        : action.status === "in-progress"
+                        ? "bg-data-gold/10 text-data-gold"
+                        : "bg-sunset-orange/10 text-sunset-orange"
+                    }`}>
+                      {action.status === "in-progress" ? "devam ediyor" : action.status === "closed" ? "kapali" : "acik"}
                     </span>
                   )}
                 </div>
 
-                {/* Deadline + Closure Criteria */}
-                <div className="flex flex-wrap items-center gap-3 mt-2">
-                  {action.deadline && (
-                    <span
-                      className={`text-xs ${
-                        deadlineStatus === "overdue"
-                          ? "text-red-600 font-semibold"
-                          : deadlineStatus === "approaching"
-                          ? "text-yellow-600 font-semibold"
-                          : "text-gray-500"
-                      }`}
-                    >
-                      {deadlineStatus === "overdue" && "GECIKTI: "}
-                      {deadlineStatus === "approaching" && "YAKLASYOR: "}
-                      Deadline: {action.deadline}
-                    </span>
-                  )}
-                  {action.closure_criteria && (
-                    <span className="text-xs text-gray-400" title="Tamamlanma kriteri">
-                      Done: {action.closure_criteria}
-                    </span>
-                  )}
-                </div>
+                {/* Deadline + Closure */}
+                {(action.deadline || action.closure_criteria) && !editable && (
+                  <div className="flex flex-wrap gap-4 text-caption">
+                    {action.deadline && (
+                      <span className={
+                        dlStatus === "overdue"
+                          ? "text-sunset-orange font-medium"
+                          : dlStatus === "approaching"
+                          ? "text-data-gold font-medium"
+                          : "text-silver-ash"
+                      }>
+                        {dlStatus === "overdue" && "GECIKTI "}
+                        {dlStatus === "approaching" && "YAKLASYOR "}
+                        {action.deadline}
+                      </span>
+                    )}
+                    {action.closure_criteria && (
+                      <span className="text-silver-ash">
+                        Done: {action.closure_criteria}
+                      </span>
+                    )}
+                  </div>
+                )}
 
-                {/* Editable deadline + closure criteria */}
+                {/* Editable fields */}
                 {editable && (
-                  <div className="flex gap-2 mt-2">
+                  <div className="flex gap-3">
                     <input
                       type="date"
                       value={action.deadline || ""}
-                      onChange={(e) =>
-                        onEdit?.(index, "deadline", e.target.value)
-                      }
-                      className="text-xs border border-gray-300 rounded px-2 py-1"
-                      placeholder="Deadline"
+                      onChange={(e) => onEdit?.(index, "deadline", e.target.value)}
+                      className="input-field text-caption"
                     />
                     <input
                       type="text"
                       value={action.closure_criteria || ""}
-                      onChange={(e) =>
-                        onEdit?.(index, "closure_criteria", e.target.value)
-                      }
-                      className="flex-1 text-xs border border-gray-300 rounded px-2 py-1"
+                      onChange={(e) => onEdit?.(index, "closure_criteria", e.target.value)}
+                      className="input-field flex-1 text-caption"
                       placeholder="Tamamlanma kriteri..."
                     />
                   </div>
@@ -188,14 +165,12 @@ export default function ActionList({
               {!editable && onStatusChange && (
                 <select
                   value={action.status}
-                  onChange={(e) =>
-                    onStatusChange(action.id, e.target.value as Action["status"])
-                  }
-                  className="text-xs border border-gray-300 rounded px-2 py-1 bg-white"
+                  onChange={(e) => onStatusChange(action.id, e.target.value as Action["status"])}
+                  className="input-field text-caption"
                 >
-                  <option value="open">Open</option>
-                  <option value="in-progress">In Progress</option>
-                  <option value="closed">Closed</option>
+                  <option value="open">Acik</option>
+                  <option value="in-progress">Devam</option>
+                  <option value="closed">Kapali</option>
                 </select>
               )}
             </div>

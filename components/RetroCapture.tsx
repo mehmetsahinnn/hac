@@ -28,7 +28,6 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
 
   const handleExtract = async () => {
     if (!notes.trim()) return;
-
     setLoading(true);
     setError(null);
 
@@ -73,10 +72,7 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          actions: extractedActions.map((a) => ({
-            ...a,
-            retro_id: retroId,
-          })),
+          actions: extractedActions.map((a) => ({ ...a, retro_id: retroId })),
           retro_id: retroId,
         }),
       });
@@ -99,65 +95,59 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
     }
   };
 
-  const handleBack = () => {
-    setStep("input");
-    setError(null);
-  };
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-5">
       {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+        <div className="bg-cloud-whisper border border-sunset-orange/20 text-sunset-orange px-5 py-4 rounded-cards text-sm">
           {error}
         </div>
       )}
 
       {step === "input" ? (
-        <>
+        <div className="space-y-5">
           <textarea
             value={notes}
             onChange={(e) => setNotes(e.target.value)}
-            placeholder="Retro notlarinizi buraya yapiştirin...&#10;&#10;Ornek:&#10;- Auth timeout sorununu cozmemiz lazim. Sarah bakacak.&#10;- Onboarding dokumanlari iyilestirilmeli. Mike gonullu oldu.&#10;- CI pipeline cok yavas, herkesi blokluyor."
-            className="w-full h-48 border border-gray-300 rounded-lg p-4 text-sm resize-y focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            placeholder="Retro notlarinizi buraya yapistirin..."
+            className="input-field w-full h-52 resize-y"
           />
           <button
             onClick={handleExtract}
             disabled={loading || !notes.trim()}
-            className="w-full bg-blue-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {loading ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              <span className="flex items-center justify-center gap-3">
+                <span className="inline-block w-4 h-4 border-2 border-canvas-white/30 border-t-canvas-white rounded-full animate-spin" />
                 AI ile aksiyonlar cikariliyor...
               </span>
             ) : (
               "Aksiyonlari Cikar"
             )}
           </button>
-        </>
+        </div>
       ) : (
-        <>
+        <div className="space-y-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold text-gray-900">
-              Cikarilan Aksiyonlar ({extractedActions.length})
+            <h2 className="font-display text-heading-sm text-midnight">
+              Cikarilan Aksiyonlar
             </h2>
             <button
-              onClick={handleBack}
-              className="text-sm text-gray-500 hover:text-gray-700"
+              onClick={() => { setStep("input"); setError(null); }}
+              className="btn-secondary"
             >
-              &larr; Geri
+              Geri
             </button>
           </div>
 
-          {/* Recurring warnings */}
           {recurringMatches.length > 0 && (
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
-              <p className="text-purple-800 text-sm font-semibold">
-                Tekrarlayan Sorunlar Tespit Edildi!
+            <div className="bg-warm-ivory rounded-cards p-5">
+              <p className="text-sm font-medium text-data-gold">
+                Tekrarlayan Sorunlar Tespit Edildi
               </p>
-              <ul className="mt-1 space-y-1">
+              <ul className="mt-2 space-y-1">
                 {recurringMatches.map((m, i) => (
-                  <li key={i} className="text-purple-700 text-xs">
+                  <li key={i} className="text-caption text-dark-shale">
                     #{m.new_index + 1}: {m.reason}
                   </li>
                 ))}
@@ -174,18 +164,18 @@ export default function RetroCapture({ onSaved }: RetroCaptureProps) {
           <button
             onClick={handleSave}
             disabled={saving || extractedActions.length === 0}
-            className="w-full bg-green-600 text-white py-2.5 px-4 rounded-lg font-medium hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="btn-primary w-full disabled:opacity-40 disabled:cursor-not-allowed"
           >
             {saving ? (
-              <span className="flex items-center justify-center gap-2">
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full" />
+              <span className="flex items-center justify-center gap-3">
+                <span className="inline-block w-4 h-4 border-2 border-canvas-white/30 border-t-canvas-white rounded-full animate-spin" />
                 Kaydediliyor...
               </span>
             ) : (
               "Tum Aksiyonlari Kaydet"
             )}
           </button>
-        </>
+        </div>
       )}
     </div>
   );

@@ -36,13 +36,9 @@ export default function ActionDashboard() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status }),
       });
-
       if (!res.ok) throw new Error("Failed to update");
-
       const data = await res.json();
-      setActions((prev) =>
-        prev.map((a) => (a.id === id ? data.action : a))
-      );
+      setActions((prev) => prev.map((a) => (a.id === id ? data.action : a)));
     } catch (err) {
       setError(err instanceof Error ? err.message : "Update failed");
     }
@@ -50,10 +46,10 @@ export default function ActionDashboard() {
 
   const filteredActions = (() => {
     switch (filter) {
-      case "all":
-        return actions;
       case "high-risk":
         return actions.filter((a) => a.risk_score >= 60);
+      case "all":
+        return actions;
       default:
         return actions.filter((a) => a.status === filter);
     }
@@ -69,51 +65,48 @@ export default function ActionDashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
+      <div className="flex items-center justify-center py-20">
+        <span className="inline-block w-6 h-6 border-2 border-midnight/20 border-t-midnight rounded-full animate-spin" />
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div className="bg-cloud-whisper border border-sunset-orange/20 text-sunset-orange px-5 py-4 rounded-cards text-sm">
         {error}
       </div>
     );
   }
 
+  const FILTERS: { id: FilterStatus; label: string }[] = [
+    { id: "all", label: "Tumu" },
+    { id: "high-risk", label: "Riskli" },
+    { id: "open", label: "Acik" },
+    { id: "in-progress", label: "Devam" },
+    { id: "closed", label: "Kapali" },
+  ];
+
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-5 gap-2">
-        {(
-          ["all", "high-risk", "open", "in-progress", "closed"] as FilterStatus[]
-        ).map((status) => (
+    <div className="space-y-8">
+      {/* Metric cards */}
+      <div className="grid grid-cols-5 gap-4">
+        {FILTERS.map((f) => (
           <button
-            key={status}
-            onClick={() => setFilter(status)}
-            className={`px-2 py-2 rounded-lg text-xs font-medium text-center transition-colors ${
-              filter === status
-                ? status === "high-risk"
-                  ? "bg-red-600 text-white"
-                  : "bg-blue-600 text-white"
-                : "bg-white border border-gray-200 text-gray-700 hover:bg-gray-50"
+            key={f.id}
+            onClick={() => setFilter(f.id)}
+            className={`rounded-cards p-4 text-center transition-all ${
+              filter === f.id
+                ? f.id === "high-risk"
+                  ? "bg-sunset-orange text-canvas-white"
+                  : "bg-midnight text-canvas-white"
+                : "bg-slate-mist text-midnight hover:bg-light-pearl"
             }`}
           >
-            <span className="block text-lg font-bold">
-              {counts[status]}
+            <span className="block text-heading-sm font-display">
+              {counts[f.id]}
             </span>
-            <span className="capitalize">
-              {status === "in-progress"
-                ? "Devam"
-                : status === "high-risk"
-                ? "Riskli"
-                : status === "all"
-                ? "Tumu"
-                : status === "open"
-                ? "Acik"
-                : "Kapali"}
-            </span>
+            <span className="text-caption opacity-80">{f.label}</span>
           </button>
         ))}
       </div>

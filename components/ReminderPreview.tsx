@@ -22,9 +22,7 @@ export default function ReminderPreview() {
         return res.json();
       })
       .then((data) => setReminders(data.reminders || []))
-      .catch((err) =>
-        setError(err instanceof Error ? err.message : "Failed to load")
-      )
+      .catch((err) => setError(err instanceof Error ? err.message : "Failed"))
       .finally(() => setLoading(false));
   }, []);
 
@@ -37,16 +35,16 @@ export default function ReminderPreview() {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-2">
-        <div className="animate-spin h-6 w-6 border-2 border-blue-600 border-t-transparent rounded-full" />
-        <p className="text-sm text-gray-500">Hatirlatmalar hazirlaniyor...</p>
+      <div className="flex flex-col items-center justify-center py-20 gap-3">
+        <span className="inline-block w-6 h-6 border-2 border-midnight/20 border-t-midnight rounded-full animate-spin" />
+        <p className="text-caption text-silver-ash">Hatirlatmalar hazirlaniyor...</p>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+      <div className="bg-cloud-whisper border border-sunset-orange/20 text-sunset-orange px-5 py-4 rounded-cards text-sm">
         {error}
       </div>
     );
@@ -54,41 +52,41 @@ export default function ReminderPreview() {
 
   if (reminders.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-500 text-sm">
-          Yuksek riskli aksiyon yok - hatirlatma gerekmez!
+      <div className="text-center py-20">
+        <p className="text-silver-ash text-sm">
+          Yuksek riskli aksiyon yok — hatirlatma gerekmez.
         </p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      <p className="text-sm text-gray-600">
-        Sadece yuksek riskli aksiyonlar icin baglam odakli hatirlatmalar:
+    <div className="space-y-5">
+      <p className="text-caption text-silver-ash">
+        Sadece yuksek riskli aksiyonlar icin baglam odakli hatirlatmalar
       </p>
       {reminders.map((reminder) => (
         <div
           key={reminder.action_id}
-          className="border border-gray-200 rounded-lg p-4 bg-white"
+          className="bg-slate-mist rounded-cards p-6"
         >
-          <div className="flex items-start justify-between">
-            <div className="flex-1">
-              <p className="text-xs text-gray-500">
-                Kime: <span className="font-medium">{reminder.to}</span>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 space-y-2">
+              <p className="text-caption text-silver-ash">
+                Kime: <span className="text-midnight font-medium">{reminder.to}</span>
               </p>
-              <p className="text-sm font-medium text-gray-900 mt-1">
+              <p className="text-sm font-medium text-midnight">
                 {reminder.subject}
               </p>
-              <p className="text-sm text-gray-700 mt-2 whitespace-pre-wrap">
+              <p className="text-body text-dark-shale whitespace-pre-wrap">
                 {reminder.body}
               </p>
             </div>
             <button
               onClick={() => handleCopy(reminder)}
-              className="ml-3 shrink-0 text-xs px-2.5 py-1.5 rounded border border-gray-300 hover:bg-gray-50 transition-colors"
+              className="btn-ghost shrink-0 text-caption"
             >
-              {copiedId === reminder.action_id ? "Kopyalandi!" : "Kopyala"}
+              {copiedId === reminder.action_id ? "Kopyalandi" : "Kopyala"}
             </button>
           </div>
         </div>

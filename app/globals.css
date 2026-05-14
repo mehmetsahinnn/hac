@@ -2,6 +2,48 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  @apply bg-gray-50 text-gray-900 antialiased;
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500&display=swap');
+
+@layer base {
+  body {
+    @apply bg-canvas-white text-midnight antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    line-height: 1.33;
+  }
+
+  h1, h2, h3 {
+    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
+    letter-spacing: -0.02em;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-slate-mist rounded-cards p-10;
+  }
+
+  .card-white {
+    @apply bg-canvas-white rounded-cards border border-light-pearl p-10;
+  }
+
+  .btn-primary {
+    @apply bg-midnight text-canvas-white px-5 py-2.5 rounded-buttons text-sm font-medium transition-all hover:opacity-90;
+  }
+
+  .btn-ghost {
+    @apply bg-transparent text-midnight border-b-2 border-midnight px-4.5 py-0 rounded-buttons text-sm font-normal transition-all hover:opacity-70;
+  }
+
+  .btn-secondary {
+    @apply bg-transparent text-silver-ash rounded-buttons text-sm font-normal transition-all hover:text-dark-shale;
+  }
+
+  .badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-cards text-xs font-medium;
+  }
+
+  .input-field {
+    @apply bg-canvas-white border border-light-pearl rounded-inputs px-4 py-2.5 text-sm text-midnight placeholder:text-silver-ash outline-none transition-all focus:border-sunset-orange;
+  }
 }
