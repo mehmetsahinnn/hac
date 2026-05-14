@@ -267,6 +267,9 @@ retro-tracker/
 
 - **Claude API** (claude-sonnet-4-6)
 - **Anthropic SDK** (@anthropic-ai/sdk)
+- **Claude Code Skills** (Marketplace'den alinip kullanildi):
+  - **Caveman Skill** -- Token-efficient communication mode for faster AI interactions
+  - **Brainstorming Skill** -- Collaborative design exploration before implementation
 - **Atlassian MCP** (for Jira/Confluence/Bitbucket integration - planned)
 
 ---
@@ -362,4 +365,4 @@ Proprietary - Prompt Sprint AI Hackathon 2026
 
 **Built with Claude Sonnet 4.6 + Next.js 14**
 
-[Repo](https://github.com/mehmetsahinnn/hac) | [Live Demo](https://hac.vercel.app) | [Design Doc](./docs/IMPLEMENTATION-GUIDE.md)
+[Repo](https://github.com/mehmetsahinnn/hac) | [Live Demo](https://hac-two.vercel.app) | [Design Doc](./docs/IMPLEMENTATION-GUIDE.md)
