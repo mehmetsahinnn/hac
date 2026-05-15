@@ -1,24 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { storage } from '@/lib/storage'
+import { NextResponse } from 'next/server'
 
-export async function POST(request: NextRequest) {
-  try {
-    const { actions } = await request.json()
-
-    if (!actions || !Array.isArray(actions)) {
-      return NextResponse.json(
-        { error: 'Actions array required' },
-        { status: 400 }
-      )
-    }
-
-    const saved = storage.addActions(actions)
-    return NextResponse.json({ actions: saved }, { status: 201 })
-  } catch (error) {
-    console.error('Bulk add actions error:', error)
-    return NextResponse.json(
-      { error: 'Failed to save actions' },
-      { status: 500 }
-    )
-  }
+// Legacy endpoint — feature removed.
+export async function POST() {
+  return NextResponse.json({ error: 'disabled' }, { status: 410 })
 }

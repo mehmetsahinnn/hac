@@ -1,15 +1,14 @@
-import { NextRequest, NextResponse } from 'next/server'
-import { storage } from '@/lib/storage'
+import { NextResponse } from 'next/server'
 
+// Legacy endpoint — feature removed.
 export async function GET() {
-  try {
-    const actions = storage.getActions()
-    return NextResponse.json({ actions })
-  } catch (error) {
-    console.error('Get actions error:', error)
-    return NextResponse.json(
-      { error: 'Failed to fetch actions' },
-      { status: 500 }
-    )
-  }
+  return NextResponse.json({ action: null })
+}
+
+export async function PATCH() {
+  return NextResponse.json({ error: 'disabled' }, { status: 410 })
+}
+
+export async function DELETE() {
+  return NextResponse.json({ error: 'disabled' }, { status: 410 })
 }

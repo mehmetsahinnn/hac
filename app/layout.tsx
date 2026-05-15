@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'Retro & Action Tracker',
-  description: 'Track retrospective action items and prevent forgotten tasks',
+  title: 'Retro Board — Start / Stop / Continue',
+  description: 'A clean, analytical retro board for the team.',
 }
 
 export default function RootLayout({
@@ -13,10 +13,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-50">
-        <main className="min-h-screen">
-          {children}
-        </main>
+      <body>
+        <main className="min-h-screen">{children}</main>
       </body>
     </html>
   )
