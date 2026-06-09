@@ -2,48 +2,61 @@
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Montserrat:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500&display=swap');
 
 @layer base {
   body {
-    @apply bg-canvas-white text-midnight antialiased;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    @apply text-bark antialiased;
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
     font-size: 15px;
-    line-height: 1.33;
+    line-height: 1.5;
+    letter-spacing: -0.025em;
+    /* Warm beige wallpaper + visible speckled recycled-paper grain */
+    background-color: #e1d7c2;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='p'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.6 0.6 0.6 0 -0.62'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' fill='%2323251d' filter='url(%23p)' opacity='0.5'/%3E%3C/svg%3E");
+    background-size: 240px 240px;
+    background-attachment: fixed;
   }
 
   h1, h2, h3 {
-    font-family: 'Montserrat', system-ui, -apple-system, sans-serif;
-    letter-spacing: -0.02em;
+    font-family: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.03em;
   }
 }
 
 @layer components {
+  /* The browser-window frame - the one elevated surface, floating on the desktop */
+  .window {
+    @apply bg-browser-white rounded-large shadow-window border border-ash-border;
+  }
+
   .card {
-    @apply bg-slate-mist rounded-cards p-10;
+    @apply bg-cream-paper rounded-cards border border-ash-border/70 p-10;
   }
 
   .card-white {
-    @apply bg-canvas-white rounded-cards border border-light-pearl p-10;
+    @apply bg-browser-white rounded-cards border border-ash-border p-10;
   }
 
+  /* Primary action - warm amber filled button (DESIGN.md) */
   .btn-primary {
-    @apply bg-midnight text-canvas-white px-5 py-2.5 rounded-buttons text-sm font-medium transition-all hover:opacity-90;
+    @apply bg-amber text-bark px-5 py-2.5 rounded-buttons text-sm font-semibold transition-all hover:bg-amber-deep active:bg-amber-shadow;
   }
 
   .btn-ghost {
-    @apply bg-transparent text-midnight border-b-2 border-midnight px-4.5 py-0 rounded-buttons text-sm font-normal transition-all hover:opacity-70;
+    @apply bg-transparent text-dark-olive border border-dark-olive/40 px-4 py-2 rounded-buttons text-sm font-medium transition-all hover:bg-fog-khaki;
   }
 
   .btn-secondary {
-    @apply bg-transparent text-silver-ash rounded-buttons text-sm font-normal transition-all hover:text-dark-shale;
+    @apply bg-transparent text-moss rounded-buttons text-sm font-medium transition-all hover:text-dark-olive;
   }
 
   .badge {
-    @apply inline-flex items-center px-2.5 py-1 rounded-cards text-xs font-medium;
+    @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium;
   }
 
   .input-field {
-    @apply bg-canvas-white border border-light-pearl rounded-inputs px-4 py-2.5 text-sm text-midnight placeholder:text-silver-ash outline-none transition-all focus:border-sunset-orange;
+    @apply bg-cream-paper border border-ash-border rounded-inputs px-4 py-2.5 text-sm text-bark placeholder:text-moss outline-none transition-all focus:border-amber focus:ring-2 focus:ring-amber/20;
   }
 }

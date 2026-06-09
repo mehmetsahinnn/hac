@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import DesktopBar from "@/components/DesktopBar";
 
 export const metadata: Metadata = {
-  title: "Retro & Action Tracker",
-  description: "AI-powered retrospective action extraction and tracking",
+  title: "RetroTool - Online Retrospectives",
+  description: "The easiest way to run engaging online retrospectives for remote and hybrid teams.",
 };
 
 export default function RootLayout({
@@ -13,7 +14,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="min-h-screen bg-canvas-white">{children}</body>
+      <body className="min-h-screen">
+        <DesktopBar />
+        <div className="pt-7">{children}</div>
+      </body>
     </html>
   );
 }

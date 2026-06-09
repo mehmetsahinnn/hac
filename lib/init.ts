@@ -1,8 +1,2 @@
-import { seedDemoData } from "./seed";
-
-const g = globalThis as unknown as { __seeded?: boolean };
-
-if (!g.__seeded) {
-  g.__seeded = true;
-  seedDemoData();
-}
+// Removed - legacy AI retro-action-tracker file. Replaced by the RetroTool board.
+export {};
