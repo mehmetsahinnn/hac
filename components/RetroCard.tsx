@@ -9,10 +9,9 @@ interface Props {
   revealed: boolean;
   isOwn: boolean;
   draft?: boolean;
-  canVote?: boolean;
+  remaining?: number;
   myVotes?: number;
-  onVote?: (id: string) => void;
-  onUnvote?: (id: string) => void;
+  onVote?: (id: string, delta: 1 | -1) => void;
   onPublish?: (id: string) => void;
   onEdit: (id: string, text: string) => void;
   onDelete: (id: string) => void;
@@ -24,10 +23,9 @@ export default function RetroCard({
   revealed,
   isOwn,
   draft = false,
-  canVote = false,
+  remaining = 0,
   myVotes = 0,
   onVote,
-  onUnvote,
   onPublish,
   onEdit,
   onDelete,
@@ -35,8 +33,6 @@ export default function RetroCard({
   const [editing, setEditing] = useState(false);
   const [text, setText] = useState(card.text);
 
-  // Own cards (and drafts) are never blurred. Only other people's published
-  // cards are hidden until the facilitator reveals.
   const hidden = !draft && !revealed && !isOwn;
 
   const save = () => {
@@ -45,6 +41,12 @@ export default function RetroCard({
     else setText(card.text);
     setEditing(false);
   };
+
+  // +1 allowed if you have budget, or it reduces an existing downvote.
+  // -1 allowed if you have budget, or it reduces an existing upvote.
+  const plusEnabled = revealed && (remaining > 0 || myVotes < 0);
+  const minusEnabled = revealed && (remaining > 0 || myVotes > 0);
+  const countColor = card.votes > 0 ? accentHex : card.votes < 0 ? "#f54e00" : "#65675e";
 
   return (
     <div
@@ -85,48 +87,43 @@ export default function RetroCard({
       )}
 
       <div className="mt-2 flex items-center justify-between gap-2">
-        {/* left side: vote control (published only) or draft label */}
+        {/* vote control: -1 [score] +1 (published cards only) */}
         {draft ? (
           <span className="text-[10px] uppercase tracking-wide text-fern font-semibold">Private</span>
         ) : (
           <div className="inline-flex items-center rounded-full bg-linen">
-            {revealed && myVotes > 0 && (
-              <button
-                onClick={() => onUnvote?.(card.id)}
-                className="px-2 py-1 text-xs font-medium text-dark-olive hover:text-ember"
-                title="Remove one of your votes"
-              >
-                -
-              </button>
-            )}
             <button
-              onClick={() => onVote?.(card.id)}
-              disabled={!revealed || !canVote}
-              className={`inline-flex items-center gap-1 text-xs font-medium rounded-full px-2.5 py-1 transition-colors ${
-                !revealed || !canVote
-                  ? "text-moss cursor-not-allowed"
-                  : "text-dark-olive hover:bg-fog-khaki"
+              onClick={() => onVote?.(card.id, -1)}
+              disabled={!minusEnabled}
+              title={revealed ? "Downvote" : "Voting opens after reveal"}
+              className={`text-xs font-semibold rounded-l-full px-2 py-1 transition-colors ${
+                minusEnabled ? "text-dark-olive hover:bg-fog-khaki hover:text-ember" : "text-moss cursor-not-allowed"
               }`}
-              title={
-                !revealed
-                  ? "Voting opens when cards are revealed"
-                  : !canVote
-                  ? "You have used all your votes"
-                  : "Upvote"
-              }
             >
-              <span style={{ color: revealed && canVote ? accentHex : undefined }}>+1</span>
-              <span>{card.votes}</span>
+              -1
             </button>
-            {revealed && myVotes > 0 && (
-              <span className="px-2 py-1 text-[10px] font-semibold rounded-full" style={{ color: accentHex }}>
-                x{myVotes}
+            <span className="px-2 text-xs font-bold tabular-nums" style={{ color: countColor }}>
+              {card.votes}
+            </span>
+            <button
+              onClick={() => onVote?.(card.id, 1)}
+              disabled={!plusEnabled}
+              title={revealed ? "Upvote" : "Voting opens after reveal"}
+              className={`text-xs font-semibold rounded-r-full px-2 py-1 transition-colors ${
+                plusEnabled ? "text-dark-olive hover:bg-fog-khaki" : "text-moss cursor-not-allowed"
+              }`}
+            >
+              +1
+            </button>
+            {revealed && myVotes !== 0 && (
+              <span className="px-2 text-[10px] font-semibold" style={{ color: countColor }}>
+                you {myVotes > 0 ? `+${myVotes}` : myVotes}
               </span>
             )}
           </div>
         )}
 
-        {/* right side: owner controls / status */}
+        {/* owner controls / status */}
         <div className="flex items-center gap-2">
           {isOwn && (
             <span className="text-[10px] uppercase tracking-wide text-amber-shadow">You</span>

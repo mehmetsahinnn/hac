@@ -17,13 +17,12 @@ interface Props {
   cards: Card[];
   userId: string;
   revealed: boolean;
-  canVote: boolean;
+  remaining: number;
   myVotes: Record<string, number>;
   onAddDraft: (columnId: string, text: string) => void;
   onPublish: (id: string) => void;
   onPublishAll: (columnId: string) => void;
-  onVote: (id: string) => void;
-  onUnvote: (id: string) => void;
+  onVote: (id: string, delta: 1 | -1) => void;
   onEdit: (id: string, text: string) => void;
   onDelete: (id: string) => void;
 }
@@ -33,13 +32,12 @@ export default function BoardColumn({
   cards,
   userId,
   revealed,
-  canVote,
+  remaining,
   myVotes,
   onAddDraft,
   onPublish,
   onPublishAll,
   onVote,
-  onUnvote,
   onEdit,
   onDelete,
 }: Props) {
@@ -79,10 +77,9 @@ export default function BoardColumn({
               accentHex={hex}
               revealed={revealed}
               isOwn={card.authorId === userId}
-              canVote={canVote}
+              remaining={remaining}
               myVotes={myVotes[card.id] || 0}
               onVote={onVote}
-              onUnvote={onUnvote}
               onEdit={onEdit}
               onDelete={onDelete}
             />

@@ -136,23 +136,27 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
       ),
     }));
 
-  const voteCard = (id: string) => {
+  // One signed vote action: delta is +1 (upvote) or -1 (downvote).
+  // Each vote in either direction uses one of your VOTE_LIMIT votes; pressing
+  // the opposite direction frees it back up.
+  const castVote = (id: string, delta: 1 | -1) => {
     if (!revealed) return flash("Cards must be revealed before voting");
-    if (remaining <= 0) return flash(`You have used all ${VOTE_LIMIT} votes`);
+    const cur = myVotes[id] || 0;
+    const next = cur + delta;
+    const usedByOthers = votesUsed(myVotes) - Math.abs(cur);
+    if (usedByOthers + Math.abs(next) > VOTE_LIMIT) {
+      return flash(`You have used all ${VOTE_LIMIT} votes`);
+    }
     update((r) => ({
       ...r,
-      cards: r.cards.map((c) => (c.id === id ? { ...c, votes: c.votes + 1 } : c)),
+      cards: r.cards.map((c) => (c.id === id ? { ...c, votes: c.votes + delta } : c)),
     }));
-    setMyVotes((v) => ({ ...v, [id]: (v[id] || 0) + 1 }));
-  };
-
-  const unvoteCard = (id: string) => {
-    if ((myVotes[id] || 0) <= 0) return;
-    update((r) => ({
-      ...r,
-      cards: r.cards.map((c) => (c.id === id ? { ...c, votes: Math.max(0, c.votes - 1) } : c)),
-    }));
-    setMyVotes((v) => ({ ...v, [id]: Math.max(0, (v[id] || 0) - 1) }));
+    setMyVotes((v) => {
+      const nv = { ...v };
+      if (next === 0) delete nv[id];
+      else nv[id] = next;
+      return nv;
+    });
   };
 
   // Only the author may edit or delete a card.
@@ -349,13 +353,12 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
               cards={retro.cards.filter((c) => c.columnId === col.id)}
               userId={userId}
               revealed={revealed}
-              canVote={remaining > 0}
+              remaining={remaining}
               myVotes={myVotes}
               onAddDraft={addDraft}
               onPublish={publishCard}
               onPublishAll={publishAll}
-              onVote={voteCard}
-              onUnvote={unvoteCard}
+              onVote={castVote}
               onEdit={editCard}
               onDelete={deleteCard}
             />

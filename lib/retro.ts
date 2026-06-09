@@ -204,5 +204,5 @@ export function saveMyVotes(retroId: string, votes: Record<string, number>): voi
 }
 
 export function votesUsed(votes: Record<string, number>): number {
-  return Object.values(votes).reduce((sum, n) => sum + (n || 0), 0);
+  return Object.values(votes).reduce((sum, n) => sum + Math.abs(n || 0), 0);
 }
