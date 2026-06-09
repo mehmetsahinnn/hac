@@ -1,5 +1,4 @@
 import Link from "next/link";
-import RecentRetros from "@/components/RecentRetros";
 import Wordmark from "@/components/Wordmark";
 import Heart from "@/components/Heart";
 
@@ -58,7 +57,6 @@ export default function Home() {
             </div>
           </div>
 
-          <RecentRetros />
         </div>
       </div>
 

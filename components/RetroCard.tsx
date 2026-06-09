@@ -44,8 +44,8 @@ export default function RetroCard({
 
   // +1 allowed if you have budget, or it reduces an existing downvote.
   // -1 allowed if you have budget, or it reduces an existing upvote.
-  const plusEnabled = revealed && (remaining > 0 || myVotes < 0);
-  const minusEnabled = revealed && (remaining > 0 || myVotes > 0);
+  const plusEnabled = revealed && !isOwn && (remaining > 0 || myVotes < 0);
+  const minusEnabled = revealed && !isOwn && (remaining > 0 || myVotes > 0);
   const countColor = card.votes > 0 ? accentHex : card.votes < 0 ? "#f54e00" : "#65675e";
 
   return (
@@ -95,7 +95,7 @@ export default function RetroCard({
             <button
               onClick={() => onVote?.(card.id, -1)}
               disabled={!minusEnabled}
-              title={revealed ? "Downvote" : "Voting opens after reveal"}
+              title={isOwn ? "You can\u2019t vote your own card" : revealed ? "Downvote" : "Voting opens after reveal"}
               className={`text-xs font-semibold rounded-l-full px-2 py-1 transition-colors ${
                 minusEnabled ? "text-dark-olive hover:bg-fog-khaki hover:text-ember" : "text-moss cursor-not-allowed"
               }`}
@@ -108,7 +108,7 @@ export default function RetroCard({
             <button
               onClick={() => onVote?.(card.id, 1)}
               disabled={!plusEnabled}
-              title={revealed ? "Upvote" : "Voting opens after reveal"}
+              title={isOwn ? "You can\u2019t vote your own card" : revealed ? "Upvote" : "Voting opens after reveal"}
               className={`text-xs font-semibold rounded-r-full px-2 py-1 transition-colors ${
                 plusEnabled ? "text-dark-olive hover:bg-fog-khaki" : "text-moss cursor-not-allowed"
               }`}

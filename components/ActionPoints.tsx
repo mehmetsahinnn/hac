@@ -21,7 +21,7 @@ export default function ActionPoints({ actions, onAdd, onToggle, onDelete, onClo
   };
 
   return (
-    <aside className="fixed top-0 right-0 h-full w-full sm:w-96 bg-browser-white border-l border-ash-border shadow-window z-30 flex flex-col">
+    <aside className="fixed top-7 right-0 h-[calc(100%-1.75rem)] w-full sm:w-96 bg-browser-white border-l border-ash-border shadow-window z-40 flex flex-col">
       <header className="flex items-center justify-between px-5 py-4 border-b border-ash-border">
         <h3 className="text-subheading font-semibold text-bark">Action points</h3>
         <button onClick={onClose} className="text-moss hover:text-bark text-sm">Close</button>

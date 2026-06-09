@@ -141,6 +141,9 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
   // the opposite direction frees it back up.
   const castVote = (id: string, delta: 1 | -1) => {
     if (!revealed) return flash("Cards must be revealed before voting");
+    const target = retro?.cards.find((c) => c.id === id);
+    if (target && target.authorId === userId)
+      return flash("You can't vote on your own card");
     const cur = myVotes[id] || 0;
     const next = cur + delta;
     const usedByOthers = votesUsed(myVotes) - Math.abs(cur);
