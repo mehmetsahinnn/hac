@@ -106,13 +106,19 @@ export default function BoardColumn({
           )}
         </div>
 
-        <input
-          value={draft}
-          onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && submit()}
-          placeholder="Type here, press Enter to save (only you can see drafts)"
-          className="input-field w-full"
-        />
+        <div className="flex gap-2">
+          <input
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && submit()}
+            placeholder="Type here... (only you can see drafts)"
+            className="input-field flex-1"
+            enterKeyHint="done"
+          />
+          <button onClick={submit} className="btn-primary shrink-0">
+            Add
+          </button>
+        </div>
 
         {myDrafts.length > 0 && (
           <div className="mt-3 space-y-2">

@@ -24,7 +24,6 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
   const [userId, setUserId] = useState("anon");
   const [loaded, setLoaded] = useState(false);
   const [showActions, setShowActions] = useState(false);
-  const [revealed, setRevealed] = useState(false);
   const [myVotes, setMyVotes] = useState<Record<string, number>>({});
   const [toast, setToast] = useState<string | null>(null);
 
@@ -69,6 +68,18 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
     if (loaded) saveMyVotes(retroId, myVotes);
   }, [myVotes, retroId, loaded]);
 
+  // When the shared timer reaches zero, reveal for everyone.
+  useEffect(() => {
+    const endsAt = retro?.timerEndsAt;
+    if (!endsAt) return;
+    const id = setInterval(() => {
+      if (Date.now() >= endsAt) {
+        update((r) => ({ ...r, revealed: true, timerEndsAt: null }));
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [retro?.timerEndsAt]);
+
   const flash = (msg: string) => {
     setToast(msg);
     setTimeout(() => setToast(null), 1800);
@@ -76,6 +87,24 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
 
   const update = (fn: (r: Retro) => Retro) =>
     setRetro((prev) => (prev ? fn(prev) : prev));
+
+  // Reveal + timer live on the board so every participant stays in sync.
+  const revealed = !!retro?.revealed;
+  const setRevealed = (v: boolean) => update((r) => ({ ...r, revealed: v }));
+
+  const startTimer = () =>
+    update((r) => ({ ...r, timerEndsAt: Date.now() + (r.timerDurationSec ?? 300) * 1000 }));
+  const pauseTimer = () =>
+    update((r) => {
+      const remainingSec = r.timerEndsAt
+        ? Math.max(0, Math.round((r.timerEndsAt - Date.now()) / 1000))
+        : r.timerDurationSec ?? 300;
+      return { ...r, timerEndsAt: null, timerDurationSec: remainingSec };
+    });
+  const resetTimer = () =>
+    update((r) => ({ ...r, timerEndsAt: null, timerDurationSec: 300, revealed: false }));
+  const changeDuration = (sec: number) =>
+    update((r) => ({ ...r, timerEndsAt: null, timerDurationSec: sec }));
 
   const used = votesUsed(myVotes);
   const remaining = Math.max(0, VOTE_LIMIT - used);
@@ -234,7 +263,14 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
           </div>
 
           <div className="hidden lg:block">
-            <Timer onComplete={() => setRevealed(true)} onReset={() => setRevealed(false)} />
+            <Timer
+              endsAt={retro.timerEndsAt ?? null}
+              durationSec={retro.timerDurationSec ?? 300}
+              onStart={startTimer}
+              onPause={pauseTimer}
+              onReset={resetTimer}
+              onChangeDuration={changeDuration}
+            />
           </div>
 
           <nav className="flex items-center gap-1 sm:gap-2">
@@ -244,7 +280,7 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
               </span>
             )}
             <button
-              onClick={() => setRevealed((v) => !v)}
+              onClick={() => setRevealed(!revealed)}
               className={`px-3 py-2 rounded-buttons text-sm font-medium transition-colors ${
                 revealed ? "text-dark-olive hover:bg-fog-khaki" : "bg-amber text-bark hover:bg-amber-deep"
               }`}
@@ -280,7 +316,14 @@ export default function RetroBoard({ retroId }: { retroId: string }) {
         </div>
 
         <div className="lg:hidden px-4 pb-3 flex items-center justify-between gap-3">
-          <Timer onComplete={() => setRevealed(true)} onReset={() => setRevealed(false)} />
+          <Timer
+              endsAt={retro.timerEndsAt ?? null}
+              durationSec={retro.timerDurationSec ?? 300}
+              onStart={startTimer}
+              onPause={pauseTimer}
+              onReset={resetTimer}
+              onChangeDuration={changeDuration}
+            />
           {revealed && (
             <span className="text-caption font-medium text-dark-olive bg-linen rounded-full px-3 py-1">
               {remaining}/{VOTE_LIMIT} votes

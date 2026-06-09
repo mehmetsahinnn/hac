@@ -80,6 +80,9 @@ export interface Retro {
   actions: ActionItem[];
   createdAt: number;
   finishedAt?: number;
+  revealed?: boolean;
+  timerEndsAt?: number | null;
+  timerDurationSec?: number;
 }
 
 const KEY = "retrotool.retros";
@@ -125,6 +128,9 @@ export function createRetro(templateId: TemplateId): Retro {
     cards: [],
     actions: [],
     createdAt: Date.now(),
+    revealed: false,
+    timerEndsAt: null,
+    timerDurationSec: 300,
   };
   const all = readAll();
   all[retro.id] = retro;
